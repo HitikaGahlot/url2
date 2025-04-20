@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Oops! Something went wrong." />
+
+
+    <title>Error</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}?v=3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/error.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-header.css') }}?v=3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/contacts-modal.css') }}?v=8">
+
+</head>
+
+<body>
+    {% if self_promo %}
+        <div class="self-promo">
+            <div class="self-promo-inner"><a href="{{ self_promo_uri }}" target="_blank" rel="noopener">🥳
+                    {{ self_promo_text }}</a></div>
+            <button id="close-button" class="self-promo-close"><img width="20" height="20"
+                    src="https://img.icons8.com/metro/30/ffffff/delete-sign.png" alt="delete-sign" /></button>
+        </div>
+    {% endif %}
+
+
+    <div class="navbar">
+        <img class="navbar-image" src="{{ url_for('static', filename='images/text.png') }}" alt="Banner Image"
+            loading="lazy" onclick="window.location.href='/'">
+        <div class="links">
+            <ul>
+                <li><a href="/" class="active">Shorten</a></li>
+                <li><a href="/stats">Stats</a></li>
+                <li><a href="/api">API</a></li>
+
+            </ul>
+        </div>
+    </div>
+
+    <div class="mobile-navbar">
+        <div class="mobile-logo">
+            <a href="/"><img class="mobile-logo-image" src="{{ url_for('static', filename='images/text.png') }}"
+                    alt="Banner Image"></a>
+        </div>
+        <button type="button" class="burger" title="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <ul class="mobile-menu">
+            <li><a href="/" class="active">Shorten</a></li>
+            <li><a href="/stats">Stats</a></li>
+            <li><a href="/api">API</a></li>
+        </ul>
+
+    </div>
+   
+
+    <div class="gif-upper"><img class="gif"
+            src="https://i.ibb.co/BBQgtVS/error.webp"
+            alt="404 GIF" loading="lazy"></div>
+
+    <div class="error-message">
+        <div class="glitch-wrapper">
+            <div class="glitch" data-glitch="{{ error_code }}, {{ error_message }}">
+                {{ error_code }}, {{ error_message }}
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="btn"><a href="/">
+                <pre>Home</pre>
+            </a></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/contacts-popup.js') }}?v=1" defer=""></script>
+    <script src="{{ url_for('static', filename='js/header.js') }}?v=1" defer=""></script>
+
+    <script src="https://code.jivosite.com/widget/hJuQcxUqnJ" async></script>
+
+    <script>
+        window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+
+</body>
+
+</html>

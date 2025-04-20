@@ -1,0 +1,5 @@
+[config]
+SCM_DO_BUILD_DURING_DEPLOYMENT=true
+POST_BUILD_COMMAND=python -m pip install --upgrade pip && pip install -r requirements.txt
+STARTUP_COMMAND=python -m azure_startup
+command = D:\home\Python39\python.exe azure-setup.py && run_on_azure.cmd 

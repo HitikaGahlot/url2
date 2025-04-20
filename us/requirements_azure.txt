@@ -1,0 +1,15 @@
+# Core requirements
+Flask>=2.0.0
+Werkzeug>=2.0.0
+Jinja2>=3.0.0
+pymongo>=4.0.0
+Flask-Cors>=3.0.10
+python-dotenv>=0.19.0
+flask-limiter>=2.0.0
+requests>=2.26.0
+
+# Azure requirements
+azure-storage-blob>=12.9.0
+applicationinsights>=0.11.10
+opencensus-ext-azure>=1.1.4
+opencensus-ext-flask>=0.8.0 

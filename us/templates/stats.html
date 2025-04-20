@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>URL Statistics</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+        content="Unlock insights with our URL statistics page. Track link performance, monitor clicks, and gauge audience engagement effortlessly. Make informed decisions to optimize your online presence with our user-friendly analytics interface." />
+    <link rel="canonical" href="/stats">
+
+    <meta content="#6af5dd" name="theme-color">
+    <meta name="moz-appearance" content="#6af5dd">
+    <meta content="#6af5dd" name="msapplication-TileColor">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/stats.css') }}?v=6">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}?v=3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-header.css') }}?v=3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/contacts-modal.css') }}?v=8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/self-promo.css') }}?v=2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/customNotification.css') }}?v=4">
+
+    <script src="{{ url_for('static', filename='js/customNotification.js') }}?v=3"></script>
+
+</head>
+
+<body>
+    {% if self_promo %}
+        <div class="self-promo" style="background-color: rgb(70, 17, 120);">
+            <div class="self-promo-inner"><a href="{{ self_promo_uri }}" target="_blank" rel="noopener">🥳
+                    {{ self_promo_text }}</a></div>
+            <button id="close-button" class="self-promo-close"><img width="20" height="20"
+                    src="https://img.icons8.com/metro/30/ffffff/delete-sign.png" alt="delete-sign" /></button>
+        </div>
+    {% endif %}
+    
+
+    <div class="navbar">
+        <img class="navbar-image" src="{{ url_for('static', filename='images/text.png') }}" alt="Banner Image"
+            loading="lazy" onclick="window.location.href='/'">
+        <div class="links">
+            <ul>
+                <li><a href="/" class="active">Shorten</a></li>
+                <li><a href="/stats">Stats</a></li>
+                <li><a href="/api">API</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="mobile-navbar">
+        <div class="mobile-logo">
+            <a href="/"><img class="mobile-logo-image" src="{{ url_for('static', filename='images/text.png') }}"
+                    alt="Banner Image"></a>
+        </div>
+        <button type="button" class="burger" title="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <ul class="mobile-menu">
+            <li><a href="/" class="active">Shorten</a></li>
+            <li><a href="/stats">Stats</a></li>
+            <li><a href="/api">API</a></li>
+        </ul>
+
+    </div>
+
+    <div class="form-section">
+        <form action="/stats" method="post" onsubmit="return checkURL();">
+            <h1>URL Statistics</h1>
+            <p id="tagline">Track your link performance and engagement</p>
+            <p id="url-error"></p>
+
+            {% if error %}
+            <script>
+                customTopNotification("Error", "{{ error }}", 10, "error");
+            </script>
+            {% elif password_error %}
+            <script>
+                customTopNotification("PasswordError", "{{ password_error }}", 10, "error");
+            </script>
+            {% endif %}
+
+            <label for="short-code">Enter the alias of the short URL</label>
+
+            <div class="buttonIn">
+                <div id="input-prefix">
+                    <span>{{ host_url }}</span>
+                </div>
+                <input type="text" id="short_code" name="short_code" required placeholder="alias" value="{{ url }}"
+                    spellcheck="false">
+
+                <button type="submit" value="Submit" id="submit" title="Submit Form"><svg class="icon-arrow"
+                        viewBox="0 0 31.49 31.49">
+                        <path
+                            d="M21.205 5.007c-.429-.444-1.143-.444-1.587 0-.429.429-.429 1.143 0 1.571l8.047 8.047H1.111C.492 14.626 0 15.118 0 15.737c0 .619.492 1.127 1.111 1.127h26.554l-8.047 8.032c-.429.444-.429 1.159 0 1.587.444.444 1.159.444 1.587 0l9.952-9.952c.444-.429.444-1.143 0-1.571l-9.952-9.953z" />
+                    </svg></button>
+            </div>
+
+            {% if password_error %}
+            <input type="password" id="password" name="password" placeholder="Password">
+            <script>
+                document.getElementById("password").focus();
+                document.getElementById("password").classList.add("shake");
+                setTimeout(function () {
+                    document.getElementById("password").classList.remove("shake");
+                }, 1000);
+            </script>
+
+            {% else %}
+            <input type="password" id="password" name="password" placeholder="Password (optional)">
+            <script>
+                document.getElementById("short_code").focus();
+            </script>
+
+            {% endif %}
+
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/stats-script.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/contacts-popup.js') }}?v=1" defer=""></script>
+    <script src="{{ url_for('static', filename='js/self-promo.js') }}" defer=""></script>
+
+    {% if error %}
+    <script>
+        document.querySelector(".buttonIn").classList.add("shake");
+        setTimeout(function () {
+            document.querySelector(".buttonIn").classList.remove("shake");
+        }, 1000);
+    </script>
+    {% endif %}
+
+    <script>
+
+        function checkURL() {
+            var enteredURL = document.getElementById("short_code").value.trim();
+            var regex = /^[^\!@#\$%\^&\*\(\)_\+\/\<\>\?:"\{\}\|\/~]+$/;
+
+            if (!regex.test(enteredURL)) {
+                document.querySelector(".buttonIn").classList.add("shake");
+                setTimeout(function () {
+                    document.querySelector(".buttonIn").classList.remove("shake");
+                }, 1000);
+                return false;
+            } else {
+                return true;
+            }
+        }
+    </script>
+
+    <script src="{{ url_for('static', filename='js/header.js') }}?v=1" defer=""></script>
+
+    <script>
+        window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+
+</body>
+
+</html>

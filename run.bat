@@ -1,0 +1,3 @@
+@echo off
+echo Starting URL Shortener Generator...
+python app.py 

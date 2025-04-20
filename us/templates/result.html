@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}" />
+    <title>URL Shortened Successfully</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/result.css') }}?v=5">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}?v=3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/self-promo.css') }}?v=2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/confetti.css') }}">
+    <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/gsap-latest-beta.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-header.css') }}?v=3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/contacts-modal.css') }}?v=8">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+</head>
+
+<body>
+    {% if self_promo %}
+        <div class="self-promo" style="background-color: #1b1717">
+            <div class="self-promo-inner"><a href="{{ self_promo_uri }}" target="_blank" rel="noopener">🥳
+                    {{ self_promo_text }}</a></div>
+            <button id="close-button" class="self-promo-close"><img width="20" height="20"
+                    src="https://img.icons8.com/metro/30/ffffff/delete-sign.png" alt="delete-sign" /></button>
+        </div>
+    {% endif %}
+
+  
+    <div class="navbar">
+        <img class="navbar-image" src="{{ url_for('static', filename='images/text.png') }}" alt="Banner Image"
+            loading="lazy" onclick="window.location.href='/'">
+        <div class="links">
+            <ul>
+                <li><a href="/" class="active">Shorten</a></li>
+                <li><a href="/stats">Stats</a></li>
+                <li><a href="/api">API</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="mobile-navbar">
+        <div class="mobile-logo">
+            <a href="/"><img class="mobile-logo-image" src="{{ url_for('static', filename='images/text.png') }}"
+                    alt="Banner Image"></a>
+        </div>
+        <button type="button" class="burger" title="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <ul class="mobile-menu">
+            <li><a href="/" class="active">Shorten</a></li>
+            <li><a href="/stats">Stats</a></li>
+            <li><a href="/api">API</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <div class="result-card">
+            <div class="card-header">
+                <h2>Your URL has been shortened!</h2>
+            </div>
+            
+            <div class="url-container">
+                <a href="{{short_url}}" target="_blank" id="short-url">{{ short_url }}</a>
+                <button class="copy-button" aria-label="Copy URL">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="card-content">
+                <div class="qr-section">
+                    <div id="qr-code-container">
+                        <img class="qrcode" id="qrcode" alt="QR Code for Sharing the ShortURL"
+                            src="{{ qr_code_data_uri }}"
+                            loading="lazy">
+                        <span id="qrcode-overlay">Download</span>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-button stats-button" onclick="viewStats()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"></path>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                        View Stats
+                    </button>
+                    
+                    <button class="action-button shorten-button" onclick="shortenAnotherLink()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        Shorten Another URL
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/result-script.js') }}?v=1"></script>
+    <script src="{{ url_for('static', filename='js/confetti.js') }}?v=2" defer></script>
+    <script src="{{ url_for('static', filename='js/contacts-popup.js') }}?v=1" defer=""></script>
+    <script src="{{ url_for('static', filename='js/header.js') }}?v=1" defer=""></script>
+
+    <script>
+        function viewStats() {
+            window.location.href = "/stats/{{ short_code }}";
+        }
+        
+        function shortenAnotherLink() {
+            window.location.href = "/";
+        }
+    </script>
+
+    <script src="{{ url_for('static', filename='js/header.js') }}?v=1" defer=""></script>
+    <script src="{{ url_for('static', filename='js/self-promo.js') }}" defer=""></script>
+
+    <script>
+        window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+
+</body>
+
+</html>

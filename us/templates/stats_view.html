@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Advanced URL Statistics</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Track your shortened URL performance with detailed statistics. Monitor clicks, analyze user behavior, and optimize your links." />
+    <link rel="canonical" href="/stats">
+
+    <meta content="#1976d2" name="theme-color">
+    <meta name="moz-appearance" content="#1976d2">
+    <meta content="#1976d2" name="msapplication-TileColor">
+
+    <!-- Base styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}?v=3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-header.css') }}?v=3">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --primary-light: rgba(26, 115, 232, 0.2);
+            --primary-dark: #1557b0;
+            --secondary-color: #0d47a1;
+            --secondary-light: rgba(13, 71, 161, 0.2);
+            --text-primary: #333333;
+            --text-secondary: #555555;
+            --background-color: #ffffff;
+            --card-bg: #ffffff;
+            --border-color: #e0e0e0;
+            --hover-color: #f5f5f5;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--background-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 24px;
+            margin-top: 20px;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+        }
+
+        .general-stats-card {
+            margin-bottom: 24px;
+            height: 100%;
+        }
+
+        .card-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 20px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stat-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .stat-value {
+            background-color: #f5f5f5;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 14px;
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+
+        .toggle-panel {
+            display: flex;
+            margin-bottom: 16px;
+            background-color: #f5f5f5;
+            border-radius: 30px;
+            overflow: hidden;
+            padding: 5px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px 15px;
+            text-align: center;
+            background: none;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            margin: 0 3px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 3px 8px rgba(26, 115, 232, 0.3);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 16px;
+        }
+
+        .chart-section {
+            display: none;
+        }
+
+        .chart-section.active {
+            display: block;
+        }
+
+        .export-qr-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 576px) {
+            .export-qr-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .export-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .export-options-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .export-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            text-align: center;
+            flex: 1;
+            max-width: 120px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .export-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .export-btn:active {
+            transform: translateY(0);
+        }
+
+        .qr-code-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .qr-code-container img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .qr-code-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 600;
+            border-radius: var(--radius);
+        }
+
+        .qr-code-container:hover .qr-code-overlay {
+            display: flex;
+        }
+
+        select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: white;
+            font-family: inherit;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .chart-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 576px) {
+            .chart-options {
+                flex-direction: column;
+            }
+        }
+        
+        /* Combined stats styling */
+        .combined-stats-container {
+            width: 100%;
+        }
+        
+        .combined-stat-group {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .combined-values {
+            display: flex;
+            gap: 12px;
+            margin-top: 6px;
+            background: #f5f7fa;
+            border-radius: 6px;
+            padding: 10px;
+        }
+        
+        .avg-values {
+            margin-top: 8px;
+            background: var(--primary-light);
+            border: 1px solid rgba(26, 115, 232, 0.1);
+        }
+        
+        .avg-values .combined-value-item {
+            background: white;
+            border: 1px solid rgba(26, 115, 232, 0.1);
+        }
+        
+        .avg-values .combined-value-number {
+            color: var(--primary-color);
+            font-size: 14px;
+        }
+        
+        .avg-values .combined-value-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        
+        .combined-value-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 6px 12px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            flex: 1;
+            position: relative;
+        }
+        
+        .combined-value-item:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 60%;
+            width: 1px;
+            background-color: var(--border-color);
+        }
+        
+        .combined-value-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .combined-value-number {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 16px;
+        }
+        
+        .clicks-combined .combined-value-item {
+            background: var(--primary-light);
+        }
+        
+        .avg-clicks-combined .combined-value-item {
+            background: var(--secondary-light);
+        }
+        
+        .avg-clicks-combined .combined-value-number {
+            color: var(--secondary-color);
+        }
+        
+        @media (max-width: 576px) {
+            .combined-values {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .combined-value-item:not(:last-child)::after {
+                display: none;
+            }
+        }
+
+        .left-column, .right-column {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .left-column .card:first-child {
+            flex-grow: 1;
+        }
+        
+        .right-column .card {
+            height: 100%;
+        }
+        
+        .export-card {
+            margin-top: auto;
+        }
+        
+        .chart-card {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        @media (max-width: 768px) {
+            .export-card {
+                margin-top: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {% if self_promo %}
+        <div class="self-promo">
+            <div class="self-promo-inner"><a href="{{ self_promo_uri }}" target="_blank" rel="noopener">🥳
+                    {{ self_promo_text }}</a></div>
+            <button id="close-button" class="self-promo-close"><img width="20" height="20"
+                    src="https://img.icons8.com/metro/30/ffffff/delete-sign.png" alt="delete-sign" /></button>
+        </div>
+    {% endif %}
+
+    <div class="navbar">
+        <img class="navbar-image" src="{{ url_for('static', filename='images/text.png') }}" alt="Banner Image"
+            loading="lazy" onclick="window.location.href='/'">
+        <div class="links">
+            <ul>
+                <li><a href="/">Shorten</a></li>
+                <li><a href="/stats" class="active">Stats</a></li>
+                <li><a href="/api">API</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="mobile-navbar">
+        <div class="mobile-logo">
+            <a href="/"><img class="mobile-logo-image" src="{{ url_for('static', filename='images/text.png') }}"
+                    alt="Banner Image"></a>
+        </div>
+        <button type="button" class="burger" title="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <ul class="mobile-menu">
+            <li><a href="/">Shorten</a></li>
+            <li><a href="/stats" class="active">Stats</a></li>
+            <li><a href="/api">API</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <div class="stats-grid">
+            <!-- Left column -->
+            <div class="left-column">
+                <!-- General Stats Card -->
+                <div class="card general-stats-card">
+                    <h2 class="card-title">General Stats : {{ json_data["short_code"] }}</h2>
+                    <div class="stat-item">
+                        <span class="stat-label">Original URL</span>
+                        <span class="stat-value">{{ json_data['url']}}</span>
+                    </div>
+                    {% if json_data["average_redirection_time"] > 0 %}
+                    <div class="stat-item">
+                        <span class="stat-label">Avg. Redirection Time</span>
+                        <span class="stat-value">{{ json_data["average_redirection_time"] }} ms</span>
+                    </div>
+                    {% endif %}
+                    <div class="stat-item clicks-combined">
+                        <div class="combined-stats-container">
+                            <div class="combined-stat-group">
+                                <span class="stat-label">Total & Average Clicks</span>
+                                <div class="combined-values">
+                                    <div class="combined-value-item">
+                                        <span class="combined-value-label">Total</span>
+                                        <span class="combined-value-number">{{ json_data["total-clicks"] }}</span>
+                                    </div>
+                                    <div class="combined-value-item">
+                                        <span class="combined-value-label">Unique</span>
+                                        <span class="combined-value-number">{{ json_data["total_unique_clicks"] }}</span>
+                                    </div>
+                                </div>
+                                <div class="combined-values">
+                                    <div class="combined-value-item">
+                                        <span class="combined-value-label">Daily</span>
+                                        <span class="combined-value-number">{{ json_data["average_daily_clicks"] }}</span>
+                                    </div>
+                                    <div class="combined-value-item">
+                                        <span class="combined-value-label">Weekly</span>
+                                        <span class="combined-value-number">{{ json_data["average_weekly_clicks"] }}</span>
+                                    </div>
+                                    <div class="combined-value-item">
+                                        <span class="combined-value-label">Monthly</span>
+                                        <span class="combined-value-number">{{ json_data["average_monthly_clicks"] }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if json_data["max-clicks"] %}
+                    <div class="stat-item">
+                        <span class="stat-label">Max Clicks</span>
+                        <span class="stat-value">{{ json_data["max-clicks"] }}</span>
+                    </div>
+                    {% endif %}
+                    {% if json_data["expired"] %}
+                    <div class="stat-item">
+                        <span class="stat-label">Expired</span>
+                        <span class="stat-value" id="expire">{{ json_data["expired"] }}</span>
+                    </div>
+                    {% endif %}
+                    {% if json_data["block-bots"] %}
+                    <div class="stat-item">
+                        <span class="stat-label">Block Bots</span>
+                        <span class="stat-value">{{ json_data["block-bots"] }}</span>
+                    </div>
+                    {% endif %}
+
+
+                </div>
+
+                <!-- Export and QR Card -->
+                <div class="card export-card">
+                    <h2 class="card-title">Export & Share</h2>
+                    <div class="export-options-row">
+                        <button class="export-btn" onclick="exportData('json')">JSON</button>
+                        <button class="export-btn" onclick="exportData('csv')">CSV</button>
+                        <button class="export-btn" onclick="exportData('xlsx')">XLSX</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right column -->
+            <div class="right-column">
+                <div class="card chart-card">
+                    <div class="toggle-panel">
+                        <button class="toggle-btn active" data-target="clicks-section">Click Counter</button>
+                        <button class="toggle-btn" data-target="browser-section">Browsers</button>
+                        <button class="toggle-btn" data-target="platform-section">Platforms</button>
+                    </div>
+
+                    <!-- Click Counter Section -->
+                    <div class="chart-section active" id="clicks-section">
+                        <div class="chart-options">
+                            <select id="counterOption" onchange="updateCounterChart()" title="Counter Date Range">
+                                <option value="last7days" selected>Last 7 Days</option>
+                                <option value="last30days">Last 30 Days</option>
+                                <option value="alltime">All Time</option>
+                            </select>
+                            <select id="counterDataOption" onchange="updateCounterChart()" title="Counter Data Option">
+                                <option value="collectiveData">Overall Clicks</option>
+                                <option value="uniqueData">Unique Clicks</option>
+                                <option value="compareBoth" selected>Compare Both</option>
+                            </select>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="counterChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Browser Section -->
+                    <div class="chart-section" id="browser-section">
+                        <div class="chart-options">
+                            <select id="browserDataOption" onchange="updateBrowserChart()" title="Browser Data Option">
+                                <option value="collectiveData">Overall Clicks</option>
+                                <option value="uniqueData">Unique Clicks</option>
+                                <option value="compareBoth" selected>Overall vs Unique</option>
+                            </select>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="browserChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Platform Section -->
+                    <div class="chart-section" id="platform-section">
+                        <div class="chart-options">
+                            <select id="osDataOption" onchange="updateOsChart()" title="OS Data Option">
+                                <option value="collectiveData">Overall Clicks</option>
+                                <option value="uniqueData">Unique Clicks</option>
+                                <option value="compareBoth" selected>Overall vs Unique</option>
+                            </select>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="osChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/header.js') }}?v=1" defer=""></script>
+    <script src="{{ url_for('static', filename='js/stats-view-script.js') }}" defer=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://cdn.anychart.com/releases/8.12.1/js/anychart-core.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.12.1/js/anychart-map.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.12.1/geodata/custom/world/world.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.12.1/js/anychart-data-adapter.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.12.1/js/anychart-exports.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.12.1/js/anychart-ui.min.js"></script>
+
+    {% if json_data["expired"] %}
+        <script>
+            function changeExpiredSpanColor() {
+                var p = document.getElementById("expire");
+                if (p.innerText === "True") {
+                    p.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
+                    p.style.color = "#d32f2f";
+                }
+                if (p.innerText === "False") {
+                    p.style.backgroundColor = "rgba(0, 255, 0, 0.2)";
+                    p.style.color = "#388e3c";
+                }
+            }
+            window.onload = changeExpiredSpanColor;
+        </script>
+    {% endif %}
+
+    <script>
+        const jsonResponse = {{ json_data| tojson }};
+
+        // Toggle between chart sections
+        document.querySelectorAll('.toggle-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                document.querySelectorAll('.toggle-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Hide all chart sections
+                document.querySelectorAll('.chart-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Show the target chart section
+                const targetSection = this.getAttribute('data-target');
+                document.getElementById(targetSection).classList.add('active');
+                
+                // Update the charts when switching to ensure they're rendered correctly
+                if (targetSection === 'clicks-section') {
+                    updateCounterChart();
+                } else if (targetSection === 'browser-section') {
+                    updateBrowserChart();
+                } else if (targetSection === 'platform-section') {
+                    updateOsChart();
+                }
+            });
+        });
+
+        function getLastNDaysCounterData(counterData, days) {
+            const counterKeys = Object.keys(counterData);
+            const lastNDaysKeys = counterKeys.slice(-days);
+
+            const lastNDaysCounterData = {};
+            lastNDaysKeys.forEach((key) => {
+                lastNDaysCounterData[key] = counterData[key];
+            });
+
+            return lastNDaysCounterData;
+        }
+
+        function updateCounterChart() {
+            const counterChartCanvas = document.getElementById('counterChart');
+
+            // Destroy the existing chart to clear the canvas
+            if (counterChartCanvas.chart) {
+                counterChartCanvas.chart.destroy();
+            }
+
+            const dataOption = document.getElementById('counterDataOption').value;
+            const option = document.getElementById('counterOption').value;
+
+            let dt = {};
+            let dt2 = {};
+
+            switch (option) {
+                case 'last7days':
+                    dt = getLastNDaysCounterData(jsonResponse.counter, 7);
+                    dt2 = getLastNDaysCounterData(jsonResponse.unique_counter, 7);
+                    break;
+                case 'last30days':
+                    dt = getLastNDaysCounterData(jsonResponse.counter, 30);
+                    dt2 = getLastNDaysCounterData(jsonResponse.unique_counter, 30);
+                    break;
+                case 'alltime':
+                    dt = jsonResponse.counter;
+                    dt2 = jsonResponse.unique_counter;
+                    break;
+                default:
+                    dt = jsonResponse.counter;
+                    dt2 = jsonResponse.unique_counter;
+            }
+
+            let datasets = [];
+            if (dataOption === "collectiveData") {
+                datasets = [
+                    {
+                        label: 'Click Counter',
+                        data: Object.values(dt),
+                        fill: 'start',
+                        backgroundColor: 'rgba(25, 118, 210, 0.2)',
+                        borderColor: 'rgba(25, 118, 210, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                    },
+                ];
+            }
+            else if (dataOption === "uniqueData") {
+                datasets = [
+                    {
+                        label: 'Unique Click Counter',
+                        data: Object.values(dt2),
+                        fill: 'start',
+                        backgroundColor: 'rgba(13, 71, 161, 0.2)',
+                        borderColor: 'rgba(13, 71, 161, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                    },
+                ];
+            }
+            else {
+                datasets = [
+                    {
+                        label: 'Click Counter',
+                        data: Object.values(dt),
+                        fill: 'start',
+                        backgroundColor: 'rgba(25, 118, 210, 0.2)',
+                        borderColor: 'rgba(25, 118, 210, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                    },
+                    {
+                        label: 'Unique Click Counter',
+                        data: Object.values(dt2),
+                        fill: 'start',
+                        backgroundColor: 'rgba(13, 71, 161, 0.2)',
+                        borderColor: 'rgba(13, 71, 161, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                    },
+                ];
+            }
+
+            const counterChart = new Chart(counterChartCanvas, {
+                type: 'line',
+                data: {
+                    labels: Object.keys(dt),
+                    datasets: datasets.map(dataset => ({
+                        ...dataset,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: dataset.borderColor,
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointHoverBorderWidth: 2,
+                        pointHoverBackgroundColor: dataset.borderColor,
+                        pointHoverBorderColor: '#fff',
+                    })),
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false,
+                            },
+                            ticks: {
+                                color: '#333333',
+                                font: {
+                                    size: 11,
+                                    family: "'Inter', sans-serif"
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                            },
+                            ticks: {
+                                color: '#333333',
+                                font: {
+                                    size: 11,
+                                    family: "'Inter', sans-serif"
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#333333',
+                                font: {
+                                    size: 12,
+                                    family: "'Inter', sans-serif",
+                                    weight: '500'
+                                },
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#333333',
+                            bodyColor: '#333333',
+                            bodyFont: {
+                                size: 12,
+                                family: "'Inter', sans-serif"
+                            },
+                            titleFont: {
+                                size: 13,
+                                family: "'Inter', sans-serif",
+                                weight: '600'
+                            },
+                            padding: 12,
+                            borderColor: 'rgba(0, 0, 0, 0.1)',
+                            borderWidth: 1,
+                            displayColors: true,
+                            boxWidth: 8,
+                            boxHeight: 8,
+                            usePointStyle: true,
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y} clicks`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            counterChartCanvas.chart = counterChart;
+        }
+
+        function updateOsChart() {
+            const osChartCanvas = document.getElementById('osChart');
+
+            if (osChartCanvas.chart) {
+                osChartCanvas.chart.destroy();
+            }
+            
+            const dataOption = document.getElementById('osDataOption').value;
+            let datasets = [];
+            
+            if (dataOption === "collectiveData") {
+                datasets = [
+                    {
+                        label: 'Platforms',
+                        data: Object.values(jsonResponse.sorted_os_name),
+                        backgroundColor: 'rgba(25, 118, 210, 0.2)',
+                        borderColor: 'rgba(25, 118, 210, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                    },
+                ];
+            }
+            else if (dataOption === "uniqueData") {
+                datasets = [
+                    {
+                        label: 'Unique Platforms',
+                        data: Object.values(jsonResponse.sorted_unique_os_name),
+                        backgroundColor: 'rgba(13, 71, 161, 0.2)',
+                        borderColor: 'rgba(13, 71, 161, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                    },
+                ];
+            }
+            else {
+                datasets = [
+                    {
+                        label: 'Platforms',
+                        data: Object.values(jsonResponse.sorted_os_name),
+                        backgroundColor: 'rgba(25, 118, 210, 0.2)',
+                        borderColor: 'rgba(25, 118, 210, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                    },
+                    {
+                        label: 'Unique Platforms',
+                        data: Object.values(jsonResponse.sorted_unique_os_name),
+                        backgroundColor: 'rgba(13, 71, 161, 0.2)',
+                        borderColor: 'rgba(13, 71, 161, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                    },
+                ];
+            }
+
+            const osChart = new Chart(osChartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(jsonResponse.sorted_os_name),
+                    datasets: datasets.map(dataset => ({
+                        ...dataset,
+                        borderRadius: 6,
+                        barThickness: 20,
+                        maxBarThickness: 25
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#333333',
+                                font: {
+                                    size: 11,
+                                    family: "'Inter', sans-serif"
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#333333',
+                                font: {
+                                    size: 11,
+                                    family: "'Inter', sans-serif"
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#333333',
+                                font: {
+                                    size: 12,
+                                    family: "'Inter', sans-serif",
+                                    weight: '500'
+                                },
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#333333',
+                            bodyColor: '#333333',
+                            bodyFont: {
+                                size: 12,
+                                family: "'Inter', sans-serif"
+                            },
+                            titleFont: {
+                                size: 13,
+                                family: "'Inter', sans-serif",
+                                weight: '600'
+                            },
+                            padding: 12,
+                            borderColor: 'rgba(0, 0, 0, 0.1)',
+                            borderWidth: 1,
+                            displayColors: true,
+                            boxWidth: 8,
+                            boxHeight: 8,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            });
+            
+            osChartCanvas.chart = osChart;
+        }
+
+        function updateBrowserChart() {
+            const browserChartCanvas = document.getElementById('browserChart');
+
+            if (browserChartCanvas.chart) {
+                browserChartCanvas.chart.destroy();
+            }
+
+            const dataOption = document.getElementById('browserDataOption').value;
+            let datasets = [];
+
+            if (dataOption === "collectiveData") {
+                datasets = [
+                    {
+                        label: 'Browsers',
+                        data: Object.values(jsonResponse.sorted_browser),
+                        backgroundColor: 'rgba(25, 118, 210, 0.2)',
+                        borderColor: 'rgba(25, 118, 210, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                    },
+                ];
+            }
+            else if (dataOption === "uniqueData") {
+                datasets = [
+                    {
+                        label: 'Unique Browsers',
+                        data: Object.values(jsonResponse.sorted_unique_browser),
+                        backgroundColor: 'rgba(13, 71, 161, 0.2)',
+                        borderColor: 'rgba(13, 71, 161, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                    },
+                ];
+            }
+            else {
+                datasets = [
+                    {
+                        label: 'Browsers',
+                        data: Object.values(jsonResponse.sorted_browser),
+                        backgroundColor: 'rgba(25, 118, 210, 0.2)',
+                        borderColor: 'rgba(25, 118, 210, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                    },
+                    {
+                        label: 'Unique Browsers',
+                        data: Object.values(jsonResponse.sorted_unique_browser),
+                        backgroundColor: 'rgba(13, 71, 161, 0.2)',
+                        borderColor: 'rgba(13, 71, 161, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                    },
+                ];
+            }
+
+            const browserChart = new Chart(browserChartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(jsonResponse.sorted_browser),
+                    datasets: datasets.map(dataset => ({
+                        ...dataset,
+                        borderRadius: 6,
+                        barThickness: 20,
+                        maxBarThickness: 25
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#333333',
+                                font: {
+                                    size: 11,
+                                    family: "'Inter', sans-serif"
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#333333',
+                                font: {
+                                    size: 11,
+                                    family: "'Inter', sans-serif"
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#333333',
+                                font: {
+                                    size: 12,
+                                    family: "'Inter', sans-serif",
+                                    weight: '500'
+                                },
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#333333',
+                            bodyColor: '#333333',
+                            bodyFont: {
+                                size: 12,
+                                family: "'Inter', sans-serif"
+                            },
+                            titleFont: {
+                                size: 13,
+                                family: "'Inter', sans-serif",
+                                weight: '600'
+                            },
+                            padding: 12,
+                            borderColor: 'rgba(0, 0, 0, 0.1)',
+                            borderWidth: 1,
+                            displayColors: true,
+                            boxWidth: 8,
+                            boxHeight: 8,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            });
+            
+            browserChartCanvas.chart = browserChart;
+        }
+
+        function exportData(format) {
+            let url = `{{ host_url }}export/{{ json_data['short_code'] }}/${format}`;
+            if("{{ json_data['password'] }}") {
+                url += `?password={{ json_data['password'] }}`;
+            }
+
+            fetch(url)
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+
+                    const tld = format === 'csv' ? 'zip' : format;
+                    link.href = url;
+                    link.download = `${format}-url-shortener-export-{{ json_data['short_code'] }}.${tld}`;
+                    document.body.appendChild(link);
+
+                    link.click();
+
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCounterChart();
+            updateBrowserChart();
+            updateOsChart();
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='js/contacts-popup.js') }}?v=1" defer=""></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.24.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-json.min.js"></script>
+
+    <script>
+        window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
+
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+
+</body>
+
+</html>

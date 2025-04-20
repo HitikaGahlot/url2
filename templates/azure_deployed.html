@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app_name }} - Azure Deployment Success</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .success-container {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .success-icon {
+            font-size: 80px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        
+        .app-url {
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 18px;
+            margin: 20px 0;
+            word-break: break-all;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: #4285f4;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            margin: 10px 5px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: #1a73e8;
+        }
+        
+        .btn-primary {
+            background-color: #4285f4;
+        }
+        
+        .btn-secondary {
+            background-color: #5f6368;
+        }
+        
+        .note {
+            font-size: 14px;
+            color: #666;
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #fff9e6;
+            border-left: 3px solid #ffc107;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Deployment Successful!</h1>
+        </header>
+        
+        <main class="success-container">
+            <div class="success-icon">✓</div>
+            
+            <h2>{{ app_name }} has been deployed to Azure</h2>
+            
+            <p>Your URL shortener is now live and accessible at:</p>
+            
+            <div class="app-url">
+                <a href="{{ app_url }}" target="_blank">{{ app_url }}</a>
+            </div>
+            
+            <div class="action-buttons">
+                <a href="{{ app_url }}" target="_blank" class="btn btn-primary">Visit Your URL Shortener</a>
+                <a href="https://portal.azure.com" target="_blank" class="btn btn-secondary">Go to Azure Portal</a>
+                <a href="{{ url_for('index') }}" class="btn">Create Another</a>
+            </div>
+            
+            <div class="note">
+                <p><strong>Note:</strong> Your application is running on an Azure App Service free tier. It may take a few moments to start up when accessed for the first time.</p>
+                <p>You can manage your application, view logs, and configure settings through the <a href="https://portal.azure.com" target="_blank">Azure Portal</a>.</p>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Thank you for using the URL Shortener Generator!</p>
+        </footer>
+    </div>
+</body>
+</html> 

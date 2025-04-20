@@ -1,0 +1,120 @@
+.custom-top-notification {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 15px 20px;
+    color: #3c4043;
+    z-index: 1000;
+    border-radius: 12px;
+    max-width: 380px;
+    min-width: 280px;
+    margin: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(60, 64, 67, 0.16), 0 2px 4px rgba(60, 64, 67, 0.24);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    animation: slide-in 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.custom-top-notification.warning {
+    background-color: #fef7e0;
+    border-left: 4px solid #fbbc04;
+}
+
+.custom-top-notification.success {
+    background-color: #e6f4ea;
+    border-left: 4px solid #34a853;
+}
+
+.custom-top-notification.error {
+    background-color: #fce8e6;
+    border-left: 4px solid #ea4335;
+}
+
+.custom-top-notification .closebtn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #5f6368;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 2px;
+    transition: all 0.2s ease;
+}
+
+.custom-top-notification.warning .closebtn:hover {
+    color: #fbbc04;
+}
+
+.custom-top-notification.success .closebtn:hover {
+    color: #34a853;
+}
+
+.custom-top-notification.error .closebtn:hover {
+    color: #ea4335;
+}
+
+.custom-top-notification p {
+    margin: 0;
+    color: #3c4043;
+    letter-spacing: 0.3px;
+    text-align: left;
+    padding: 5px 25px 5px 0;
+    font-weight: 400;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+.custom-top-notification .close-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.custom-top-notification.warning .close-progress-bar {
+    background: #fbbc04;
+}
+
+.custom-top-notification.success .close-progress-bar {
+    background: #34a853;
+}
+
+.custom-top-notification.error .close-progress-bar {
+    background: #ea4335;
+}
+
+@keyframes progress-bar-animation {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0;
+    }
+}
+
+@keyframes slide-in {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .custom-top-notification {
+        max-width: calc(100% - 40px);
+        margin: 20px;
+    }
+}

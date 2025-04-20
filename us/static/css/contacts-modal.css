@@ -1,0 +1,135 @@
+.modal {
+    overflow-y: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999999999999999999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    margin: auto;
+    margin-top: 70px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(60, 64, 67, 0.3);
+    width: 100%;
+    max-width: 500px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #3c4043;
+    animation: fadeIn 0.4s forwards;
+}
+
+.modal-content.closing {
+    animation: fadeOut 0.4s forwards;
+}
+
+.modal-content button {
+    width: 100%;
+    max-width: 300px;
+}
+
+.modal-content h2 {
+    color: #202124;
+    font-size: 32px;
+    padding: 0;
+    margin-bottom: 40px;
+    font-weight: 500;
+    text-align: center;
+    margin-top: 10px;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    border-bottom: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content .button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+.modal-content button {
+    display: flex;
+    align-items: center;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    height: 50px;
+    padding: 0 20px;
+    cursor: pointer;
+    margin: 15px 10px;
+    border-radius: 10px;
+    color: #3c4043;
+    font-size: 18px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: #f5f5f5;
+}
+
+.modal-content button img {
+    width: 30px;
+    height: 30px;
+}
+
+.modal-content button p {
+    margin: 0 auto;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.modal-content button:hover {
+    background: #d2e3fc;
+    color: #4285f4;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .modal-content {
+        width: 100%;
+        padding: 20px;
+        font-size: 0.9em;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin: 10px 20px;
+    }
+
+    .modal-content button {
+        margin: 15px 0;
+    }
+
+    .modal-content h2 {
+        margin-bottom: 10px;
+    }
+}

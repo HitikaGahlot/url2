@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>URL Shortener Generator</h1>
+            <p>Create your own customized URL shortener in minutes</p>
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <main>
+            <div class="card">
+                <form action="{{ url_for('generate') }}" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="name">URL Shortener Name</label>
+                        <input type="text" id="name" name="name" required placeholder="e.g., My Awesome URL Shortener">
+                        <p class="help-text">This will replace all instances of "URL Shortener" in the application</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="accent_color">Accent Color</label>
+                        <div class="color-picker-container">
+                            <input type="color" id="accent_color" name="accent_color" value="#4285f4">
+                            <div class="color-preview">
+                                <div class="preview-sample">
+                                    <div class="preview-box"></div>
+                                    <span>Primary Color</span>
+                                </div>
+                                <div class="preview-sample">
+                                    <button class="preview-button">Button</button>
+                                    <span>Button Style</span>
+                                </div>
+                                <div class="preview-sample">
+                                    <a href="#" class="preview-link">Link Example</a>
+                                    <span>Link Style</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="help-text">Choose the main color theme for your URL shortener</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Advanced Options</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="custom_alias" name="advanced_options" value="custom_alias" checked>
+                                <label for="custom_alias">Custom Alias</label>
+                                <span class="help-text">Allow users to create custom short URLs</span>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="password_protection" name="advanced_options" value="password_protection" checked>
+                                <label for="password_protection">Password Protection</label>
+                                <span class="help-text">Enable password protection for links</span>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="max_clicks" name="advanced_options" value="max_clicks" checked>
+                                <label for="max_clicks">Maximum Clicks</label>
+                                <span class="help-text">Set maximum number of clicks for links</span>
+                            </div>
+                        </div>
+                        <p class="help-text">Select which features to include in your URL shortener</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="logo">Logo Image (PNG)</label>
+                        <input type="file" id="logo" name="logo" accept="image/*">
+                        <p class="help-text">This will replace the default logo image (text.png)</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="favicon">Favicon Image (PNG)</label>
+                        <input type="file" id="favicon" name="favicon" accept="image/*">
+                        <p class="help-text">This will replace the default favicon image (favicon.png)</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mongodb_uri">MongoDB Connection String</label>
+                        <input type="text" id="mongodb_uri" name="mongodb_uri" placeholder="mongodb://username:password@host:port/database">
+                        <p class="help-text">Your MongoDB connection string will be added to the environment variables</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Deployment Option</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="docker" name="deployment_option" value="docker" checked>
+                                <label for="docker">Docker Deployment</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="standalone" name="deployment_option" value="standalone">
+                                <label for="standalone">Standalone Python Deployment</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="azure" name="deployment_option" value="azure">
+                                <label for="azure">Deploy to Azure</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="generate-btn">Generate URL Shortener</button>
+                </form>
+            </div>
+
+            <div class="features">
+                <h2>Features of the URL Shortener</h2>
+                <ul>
+                    <li>URL shortening - converting long URLs into compact, shareable links</li>
+                    <li>Statistics tracking - collecting data on clicks, browsers, and platforms</li>
+                    <li>Visualization - displaying click data through interactive charts and graphs</li>
+                    <li>Export functionality - allowing users to download stats in various formats</li>
+                    <li>API access - enabling programmatic interaction with the service</li>
+                </ul>
+            </div>
+        </main>
+
+        <footer>
+            <p>Once generated, your custom URL shortener will be downloaded as a ZIP file with deployment instructions or deployed directly to Azure if selected.</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html> 
