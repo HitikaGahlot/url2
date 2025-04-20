@@ -10,3 +10,4 @@ azure-mgmt-web
 azure-mgmt-resource
 requests
 gunicorn
+flask-cors
